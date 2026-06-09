@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/admin-guard";
-import { prisma } from "@/lib/prisma";
+import { categories, products } from "@/data/catalog";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Badge } from "@/components/ui/badge";
 
@@ -7,10 +7,8 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminCategoriesPage() {
   const session = await requireAdmin();
-  const categories = await prisma.category.findMany({
-    include: { _count: { select: { products: true } } },
-    orderBy: { order: "asc" },
-  });
+  const list = [...categories].sort((a, b) => a.order - b.order);
+  const countFor = (slug: string) => products.filter((p) => p.category.slug === slug).length;
 
   return (
     <AdminShell title="Categories" user={session.user}>
@@ -25,14 +23,14 @@ export default async function AdminCategoriesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {categories.map((c) => (
+            {list.map((c) => (
               <tr key={c.id} className="hover:bg-surface/50">
                 <td className="px-4 py-3 font-medium">{c.name}</td>
                 <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{c.slug}</td>
                 <td className="px-4 py-3">
                   <Badge variant={c.vertical === "BANKING" ? "accent" : "success"}>{c.vertical}</Badge>
                 </td>
-                <td className="px-4 py-3">{c._count.products}</td>
+                <td className="px-4 py-3">{countFor(c.slug)}</td>
               </tr>
             ))}
           </tbody>

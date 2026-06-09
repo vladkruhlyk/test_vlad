@@ -1,11 +1,8 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { createHash } from "node:crypto";
-import { prisma } from "./prisma";
 
-function hash(pw: string) {
-  return createHash("sha256").update(pw).digest("hex");
-}
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "admin@example.com";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "admin123";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -19,13 +16,10 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) return null;
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-        if (!user || !user.passwordHash) return null;
-        if (user.passwordHash !== hash(credentials.password)) return null;
-        if (user.role !== "ADMIN" && user.role !== "EDITOR") return null;
-        return { id: user.id, email: user.email, name: user.name, role: user.role };
+        if (credentials.email !== ADMIN_EMAIL || credentials.password !== ADMIN_PASSWORD) {
+          return null;
+        }
+        return { id: "admin", email: ADMIN_EMAIL, name: "Admin", role: "ADMIN" };
       },
     }),
   ],

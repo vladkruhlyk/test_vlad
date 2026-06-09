@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/admin-guard";
-import { prisma } from "@/lib/prisma";
+import { posts } from "@/data/blog";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/format";
@@ -8,10 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminBlogPage() {
   const session = await requireAdmin();
-  const posts = await prisma.blogPost.findMany({
-    include: { author: { select: { name: true } } },
-    orderBy: { publishedAt: "desc" },
-  });
+  const list = [...posts].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
   return (
     <AdminShell title="Blog" user={session.user}>
@@ -27,7 +24,7 @@ export default async function AdminBlogPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {posts.map((p) => (
+            {list.map((p) => (
               <tr key={p.id} className="hover:bg-surface/50">
                 <td className="px-4 py-3 font-medium">{p.title}</td>
                 <td className="px-4 py-3 text-muted-foreground">{p.category}</td>

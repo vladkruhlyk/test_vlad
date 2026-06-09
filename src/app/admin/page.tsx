@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Package, FileText, MousePointerClick, Users, ArrowUpRight } from "lucide-react";
+import { Package, FileText, FolderTree, Building2, ArrowUpRight } from "lucide-react";
 import { requireAdmin } from "@/lib/admin-guard";
-import { prisma } from "@/lib/prisma";
+import { products, categories, banks, providers } from "@/data/catalog";
+import { posts } from "@/data/blog";
 import { AdminShell } from "@/components/admin/admin-shell";
 
 export const dynamic = "force-dynamic";
@@ -9,28 +10,22 @@ export const dynamic = "force-dynamic";
 export default async function AdminDashboard() {
   const session = await requireAdmin();
 
-  const [products, posts, leads, subscribers, clickAgg, topLinks] = await Promise.all([
-    prisma.product.count(),
-    prisma.blogPost.count(),
-    prisma.lead.count(),
-    prisma.newsletterSubscriber.count(),
-    prisma.affiliateLink.aggregate({ _sum: { clicks: true } }),
-    prisma.affiliateLink.findMany({
-      orderBy: { clicks: "desc" },
-      take: 5,
-      include: { product: { select: { name: true, slug: true } } },
-    }),
-  ]);
-
   const stats = [
-    { label: "Products", value: products, icon: Package, href: "/admin/products" },
-    { label: "Blog posts", value: posts, icon: FileText, href: "/admin/blog" },
-    { label: "Affiliate clicks", value: clickAgg._sum.clicks ?? 0, icon: MousePointerClick, href: "/admin/analytics" },
-    { label: "Leads", value: leads, icon: Users, href: "/admin/analytics" },
+    { label: "Products", value: products.length, icon: Package, href: "/admin/products" },
+    { label: "Blog posts", value: posts.length, icon: FileText, href: "/admin/blog" },
+    { label: "Categories", value: categories.length, icon: FolderTree, href: "/admin/categories" },
+    { label: "Brands", value: banks.length + providers.length, icon: Building2, href: "/admin/affiliate-links" },
   ];
+
+  const topProducts = [...products].sort((a, b) => b.popularity - a.popularity).slice(0, 5);
 
   return (
     <AdminShell title="Dashboard" user={session.user}>
+      <p className="mb-6 rounded-xl border border-border bg-background p-4 text-sm text-muted-foreground">
+        Content is served from static data and will be managed in the CMS (Sanity). This panel is
+        read-only — live click & lead analytics come from your analytics provider once connected.
+      </p>
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
           <Link
@@ -50,26 +45,17 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-border bg-background p-6 shadow-soft">
-          <h2 className="font-semibold">Top affiliate links</h2>
-          <div className="mt-4 space-y-3">
-            {topLinks.map((l) => (
-              <div key={l.id} className="flex items-center justify-between text-sm">
-                <span className="truncate">{l.product.name}</span>
-                <span className="ml-3 shrink-0 font-semibold">{l.clicks} clicks</span>
-              </div>
-            ))}
-            {topLinks.length === 0 && (
-              <p className="text-sm text-muted-foreground">No clicks recorded yet.</p>
-            )}
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-border bg-background p-6 shadow-soft">
-          <h2 className="font-semibold">Newsletter</h2>
-          <p className="mt-4 text-3xl font-semibold">{subscribers.toLocaleString()}</p>
-          <p className="text-sm text-muted-foreground">Total subscribers</p>
+      <div className="mt-6 rounded-2xl border border-border bg-background p-6 shadow-soft">
+        <h2 className="font-semibold">Most popular products</h2>
+        <div className="mt-4 space-y-3">
+          {topProducts.map((p) => (
+            <div key={p.id} className="flex items-center justify-between text-sm">
+              <span className="truncate">{p.name}</span>
+              <span className="ml-3 shrink-0 font-semibold text-muted-foreground">
+                {p.rating?.overall.toFixed(1) ?? "—"} ★
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </AdminShell>

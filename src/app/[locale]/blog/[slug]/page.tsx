@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowLeft, CalendarDays, Clock } from "lucide-react";
-import { prisma } from "@/lib/prisma";
+import { posts } from "@/data/blog";
 import { getBlogPost, getBlogPosts } from "@/lib/queries";
 import { getPostSource, extractToc } from "@/lib/mdx";
 import { absoluteUrl } from "@/lib/utils";
@@ -24,12 +24,8 @@ import { TableOfContents } from "@/components/blog/table-of-contents";
 import { mdxComponents } from "@/components/blog/mdx-components";
 import type { Locale } from "@/lib/site";
 
-export async function generateStaticParams() {
-  const posts = await prisma.blogPost.findMany({
-    where: { published: true },
-    select: { slug: true },
-  });
-  return posts.map((p) => ({ slug: p.slug }));
+export function generateStaticParams() {
+  return posts.filter((p) => p.published).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({

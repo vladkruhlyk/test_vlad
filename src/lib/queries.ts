@@ -1,25 +1,14 @@
-import { Prisma } from "@prisma/client";
-import { prisma } from "./prisma";
+import { products, categories, brandsFor } from "@/data/catalog";
+import { posts } from "@/data/blog";
+import { globalFaqs } from "@/data/faqs";
+import type { ProductWithRelations, Vertical } from "@/data/types";
 
-/** Shared include used everywhere a "full" product is rendered. */
-export const productInclude = {
-  rating: true,
-  bank: true,
-  insuranceProvider: true,
-  features: { orderBy: { order: "asc" } },
-  faqs: { orderBy: { order: "asc" } },
-  affiliateLinks: { where: { isActive: true } },
-  category: true,
-} satisfies Prisma.ProductInclude;
-
-export type ProductWithRelations = Prisma.ProductGetPayload<{
-  include: typeof productInclude;
-}>;
+export type { ProductWithRelations } from "@/data/types";
 
 export interface ProductFilters {
   type?: string | string[];
   categorySlug?: string;
-  vertical?: "BANKING" | "INSURANCE";
+  vertical?: Vertical;
   search?: string;
   maxMonthlyFee?: number;
   onlineOpening?: boolean;
@@ -30,7 +19,6 @@ export interface ProductFilters {
   businessFriendly?: boolean;
   freeMaintenance?: boolean;
   cashback?: boolean;
-  // Extended filters
   freeCard?: boolean;
   hasBonus?: boolean;
   noPeselRequired?: boolean;
@@ -42,204 +30,134 @@ export interface ProductFilters {
   perPage?: number;
 }
 
-function buildWhere(filters: ProductFilters): Prisma.ProductWhereInput {
-  const where: Prisma.ProductWhereInput = { published: true };
-  const and: Prisma.ProductWhereInput[] = [];
+function matches(p: ProductWithRelations, f: ProductFilters): boolean {
+  if (!p.published) return false;
+  if (f.type) {
+    const types = Array.isArray(f.type) ? f.type : [f.type];
+    if (!types.includes(p.type)) return false;
+  }
+  if (f.categorySlug && p.category.slug !== f.categorySlug) return false;
+  if (!f.categorySlug && f.vertical && p.category.vertical !== f.vertical) return false;
 
-  if (filters.type) {
-    where.type = Array.isArray(filters.type) ? { in: filters.type } : filters.type;
+  if (f.search) {
+    const q = f.search.toLowerCase();
+    const hay = [p.name, p.tagline, p.bank?.name, p.insuranceProvider?.name]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    if (!hay.includes(q)) return false;
   }
-  if (filters.categorySlug) {
-    where.category = { slug: filters.categorySlug };
-  } else if (filters.vertical) {
-    where.category = { vertical: filters.vertical };
+  if (f.brands?.length) {
+    const slug = p.bank?.slug ?? p.insuranceProvider?.slug;
+    if (!slug || !f.brands.includes(slug)) return false;
   }
-  if (filters.search) {
-    and.push({
-      OR: [
-        { name: { contains: filters.search } },
-        { tagline: { contains: filters.search } },
-        { bank: { name: { contains: filters.search } } },
-        { insuranceProvider: { name: { contains: filters.search } } },
-      ],
-    });
-  }
-  if (filters.brands?.length) {
-    and.push({
-      OR: [
-        { bank: { slug: { in: filters.brands } } },
-        { insuranceProvider: { slug: { in: filters.brands } } },
-      ],
-    });
-  }
-  if (typeof filters.maxMonthlyFee === "number") {
-    where.monthlyFee = { lte: filters.maxMonthlyFee };
-  }
-  for (const flag of [
-    "onlineOpening",
-    "applePay",
-    "googlePay",
-    "blik",
-    "foreignersFriendly",
-    "businessFriendly",
-    "freeMaintenance",
-    "noPeselRequired",
-    "eurAccount",
-  ] as const) {
-    if (filters[flag]) where[flag] = true;
-  }
-  if (filters.cashback) where.cashbackPercent = { gt: 0 };
-  if (filters.freeCard) where.cardFee = 0;
-  if (filters.hasBonus) where.promoAmount = { gt: 0 };
-  if (typeof filters.minRating === "number") {
-    where.rating = { overall: { gte: filters.minRating } };
-  }
+  if (typeof f.maxMonthlyFee === "number" && (p.monthlyFee ?? Infinity) > f.maxMonthlyFee) return false;
 
-  if (and.length) where.AND = and;
-  return where;
+  const boolChecks: Array<[boolean | undefined, boolean]> = [
+    [f.onlineOpening, p.onlineOpening],
+    [f.applePay, p.applePay],
+    [f.googlePay, p.googlePay],
+    [f.blik, p.blik],
+    [f.foreignersFriendly, p.foreignersFriendly],
+    [f.businessFriendly, p.businessFriendly],
+    [f.freeMaintenance, p.freeMaintenance],
+    [f.noPeselRequired, p.noPeselRequired],
+    [f.eurAccount, p.eurAccount],
+  ];
+  for (const [want, has] of boolChecks) if (want && !has) return false;
+
+  if (f.cashback && !((p.cashbackPercent ?? 0) > 0)) return false;
+  if (f.freeCard && p.cardFee !== 0) return false;
+  if (f.hasBonus && !((p.promoAmount ?? 0) > 0)) return false;
+  if (typeof f.minRating === "number" && (p.rating?.overall ?? 0) < f.minRating) return false;
+
+  return true;
 }
 
-/** Distinct brands available within a vertical, for the brand filter. */
-export async function getBrands(vertical: "BANKING" | "INSURANCE") {
-  if (vertical === "BANKING") {
-    return prisma.bank.findMany({
-      where: { products: { some: { published: true } } },
-      select: { slug: true, name: true },
-      orderBy: { name: "asc" },
-    });
-  }
-  return prisma.insuranceProvider.findMany({
-    where: { products: { some: { published: true } } },
-    select: { slug: true, name: true },
-    orderBy: { name: "asc" },
-  });
-}
-
-function buildOrderBy(
-  sort: ProductFilters["sort"],
-): Prisma.ProductOrderByWithRelationInput[] {
+function sortProducts(list: ProductWithRelations[], sort: ProductFilters["sort"]) {
+  const arr = [...list];
   switch (sort) {
     case "rating":
-      return [{ rating: { overall: "desc" } }, { popularity: "desc" }];
+      return arr.sort((a, b) => (b.rating?.overall ?? 0) - (a.rating?.overall ?? 0) || b.popularity - a.popularity);
     case "feeAsc":
-      return [{ monthlyFee: "asc" }, { popularity: "desc" }];
+      return arr.sort((a, b) => (a.monthlyFee ?? Infinity) - (b.monthlyFee ?? Infinity) || b.popularity - a.popularity);
     case "feeDesc":
-      return [{ monthlyFee: "desc" }, { popularity: "desc" }];
+      return arr.sort((a, b) => (b.monthlyFee ?? -Infinity) - (a.monthlyFee ?? -Infinity) || b.popularity - a.popularity);
     default:
-      return [{ featured: "desc" }, { popularity: "desc" }];
+      return arr.sort((a, b) => Number(b.featured) - Number(a.featured) || b.popularity - a.popularity);
   }
 }
 
 export async function getProducts(filters: ProductFilters = {}) {
   const page = Math.max(1, filters.page ?? 1);
   const perPage = filters.perPage ?? 9;
-  const where = buildWhere(filters);
-
-  const [items, total] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      include: productInclude,
-      orderBy: buildOrderBy(filters.sort),
-      skip: (page - 1) * perPage,
-      take: perPage,
-    }),
-    prisma.product.count({ where }),
-  ]);
-
-  return {
-    items,
-    total,
-    page,
-    perPage,
-    totalPages: Math.max(1, Math.ceil(total / perPage)),
-  };
+  const all = sortProducts(products.filter((p) => matches(p, filters)), filters.sort);
+  const total = all.length;
+  const items = all.slice((page - 1) * perPage, (page - 1) * perPage + perPage);
+  return { items, total, page, perPage, totalPages: Math.max(1, Math.ceil(total / perPage)) };
 }
 
 export async function getFeaturedProducts(limit = 6) {
-  return prisma.product.findMany({
-    where: { published: true, featured: true },
-    include: productInclude,
-    orderBy: { popularity: "desc" },
-    take: limit,
-  });
+  return products
+    .filter((p) => p.published && p.featured)
+    .sort((a, b) => b.popularity - a.popularity)
+    .slice(0, limit);
 }
 
 export async function getProductBySlug(slug: string) {
-  return prisma.product.findUnique({
-    where: { slug },
-    include: { ...productInclude, reviews: { orderBy: { createdAt: "desc" }, take: 6 } },
-  });
+  return products.find((p) => p.slug === slug) ?? null;
 }
 
-export async function getRelatedProducts(
-  product: { id: string; type: string },
-  limit = 3,
-) {
-  return prisma.product.findMany({
-    where: { published: true, type: product.type, id: { not: product.id } },
-    include: productInclude,
-    orderBy: { popularity: "desc" },
-    take: limit,
-  });
+export async function getRelatedProducts(product: { id: string; type: string }, limit = 3) {
+  return products
+    .filter((p) => p.published && p.type === product.type && p.id !== product.id)
+    .sort((a, b) => b.popularity - a.popularity)
+    .slice(0, limit);
 }
 
 export async function getProductsByIds(ids: string[]) {
   if (!ids.length) return [];
-  const products = await prisma.product.findMany({
-    where: { id: { in: ids }, published: true },
-    include: productInclude,
-  });
-  // Preserve requested order
-  return ids.map((id) => products.find((p) => p.id === id)).filter(Boolean) as typeof products;
+  return ids
+    .map((id) => products.find((p) => p.id === id && p.published))
+    .filter(Boolean) as ProductWithRelations[];
 }
 
-export async function getCategories(vertical?: "BANKING" | "INSURANCE") {
-  return prisma.category.findMany({
-    where: vertical ? { vertical } : undefined,
-    orderBy: { order: "asc" },
-  });
+export async function getCategories(vertical?: Vertical) {
+  return categories
+    .filter((c) => !vertical || c.vertical === vertical)
+    .sort((a, b) => a.order - b.order);
 }
 
 export async function getCategoryBySlug(slug: string) {
-  return prisma.category.findUnique({ where: { slug } });
+  return categories.find((c) => c.slug === slug) ?? null;
 }
 
 export async function getTopRanked(type: string, limit = 1) {
-  return prisma.product.findMany({
-    where: { published: true, type },
-    include: productInclude,
-    orderBy: [{ rating: { overall: "desc" } }, { popularity: "desc" }],
-    take: limit,
-  });
+  return products
+    .filter((p) => p.published && p.type === type)
+    .sort((a, b) => (b.rating?.overall ?? 0) - (a.rating?.overall ?? 0) || b.popularity - a.popularity)
+    .slice(0, limit);
+}
+
+export async function getBrands(vertical: Vertical) {
+  return brandsFor(vertical);
 }
 
 // --- Blog ---
 
 export async function getBlogPosts(opts: { category?: string; limit?: number } = {}) {
-  return prisma.blogPost.findMany({
-    where: {
-      published: true,
-      ...(opts.category && opts.category !== "ALL" ? { category: opts.category } : {}),
-    },
-    include: { author: true },
-    orderBy: { publishedAt: "desc" },
-    take: opts.limit,
-  });
+  const list = posts
+    .filter((p) => p.published && (!opts.category || opts.category === "ALL" || p.category === opts.category))
+    .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+  return opts.limit ? list.slice(0, opts.limit) : list;
 }
 
 export async function getBlogPost(slug: string) {
-  return prisma.blogPost.findUnique({
-    where: { slug },
-    include: { author: true, faqs: { orderBy: { order: "asc" } } },
-  });
+  return posts.find((p) => p.slug === slug) ?? null;
 }
 
-// --- Global FAQ (for homepage) ---
+// --- Global FAQ ---
 
 export async function getGlobalFaqs(limit = 6) {
-  return prisma.fAQ.findMany({
-    where: { productId: null, blogPostId: null },
-    orderBy: { order: "asc" },
-    take: limit,
-  });
+  return globalFaqs.slice(0, limit);
 }

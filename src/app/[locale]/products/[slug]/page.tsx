@@ -8,7 +8,7 @@ import {
   ListChecks,
   Sparkles,
 } from "lucide-react";
-import { prisma } from "@/lib/prisma";
+import { products } from "@/data/catalog";
 import { getProductBySlug, getRelatedProducts } from "@/lib/queries";
 import { asStringArray, absoluteUrl } from "@/lib/utils";
 import { formatCurrency, formatMonthlyFee, formatDate } from "@/lib/format";
@@ -39,12 +39,8 @@ import type { Locale } from "@/lib/site";
 
 export const dynamicParams = true;
 
-export async function generateStaticParams() {
-  const products = await prisma.product.findMany({
-    where: { published: true },
-    select: { slug: true },
-  });
-  return products.map((p) => ({ slug: p.slug }));
+export function generateStaticParams() {
+  return products.filter((p) => p.published).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({

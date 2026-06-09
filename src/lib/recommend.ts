@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { prisma } from "./prisma";
-import { productInclude } from "./queries";
+import { products } from "@/data/catalog";
 
 export const wizardSchema = z.object({
   pesel: z.boolean(),
@@ -46,24 +45,16 @@ export async function recommendProducts(
   answers: WizardAnswers,
   limit = 3,
 ): Promise<RecommendedProduct[]> {
-  // Recommendations focus on account products (the wizard is account-oriented).
-  const products = await prisma.product.findMany({
-    where: {
-      published: true,
-      type: { in: ["PERSONAL_ACCOUNT", "BUSINESS_ACCOUNT"] },
-    },
-    include: productInclude,
-  });
+  const accountProducts = products.filter(
+    (p) => p.published && (p.type === "PERSONAL_ACCOUNT" || p.type === "BUSINESS_ACCOUNT"),
+  );
 
-  const scored = products.map((p) => {
+  const scored = accountProducts.map((p) => {
     let score = 0;
-
-    // No PESEL → strongly prefer foreigner-friendly / no-PESEL accounts.
     if (!answers.pesel) {
       if (p.noPeselRequired) score += 5;
       if (p.foreignersFriendly) score += 3;
     }
-    // Self-employed → business accounts.
     if (answers.selfEmployed) {
       if (p.type === "BUSINESS_ACCOUNT") score += 5;
       if (p.businessFriendly) score += 2;
@@ -74,10 +65,7 @@ export async function recommendProducts(
     if (answers.eur && p.eurAccount) score += 4;
     if (answers.freeMaintenance && (p.freeMaintenance || p.monthlyFee === 0)) score += 2;
     if (answers.online && p.onlineOpening) score += 2;
-
-    // Rating nudge (0..1) for tie-breaking.
     score += (p.rating?.overall ?? 0) / 5;
-
     return { p, score };
   });
 

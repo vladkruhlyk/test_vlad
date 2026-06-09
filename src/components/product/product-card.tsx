@@ -92,20 +92,20 @@ export async function ProductCard({
             <Badge variant="success">{product.cashbackPercent}% cashback</Badge>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <ApplyButton
-            linkId={primaryLink?.id}
-            url={primaryLink?.url}
-            productSlug={product.slug}
-            label={tp("apply")}
-            size="sm"
-            className="flex-1"
-          />
-          <CompareToggle productId={product.id} />
+        <ApplyButton
+          linkId={primaryLink?.id}
+          url={primaryLink?.url}
+          productSlug={product.slug}
+          label={tp("apply")}
+          size="sm"
+          className="w-full"
+        />
+        <div className="mt-2 flex items-center gap-2">
+          <CompareToggle productId={product.id} className="flex-1" />
+          <Button asChild variant="outline" size="sm" className="flex-1">
+            <Link href={`/products/${product.slug}`}>{t("viewDetails")}</Link>
+          </Button>
         </div>
-        <Button asChild variant="link" size="sm" className="mt-1 h-auto p-0 text-muted-foreground">
-          <Link href={`/products/${product.slug}`}>{t("viewDetails")}</Link>
-        </Button>
       </div>
     </Card>
   );

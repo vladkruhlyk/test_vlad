@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { prisma } from "@/lib/prisma";
+import { products, categories } from "@/data/catalog";
+import { posts } from "@/data/blog";
 import { siteConfig } from "@/lib/site";
 
 const LOCALES = siteConfig.locales;
@@ -23,13 +24,7 @@ function entry(path: string, priority = 0.7): MetadataRoute.Sitemap[number] {
   };
 }
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, posts, categories] = await Promise.all([
-    prisma.product.findMany({ where: { published: true }, select: { slug: true } }),
-    prisma.blogPost.findMany({ where: { published: true }, select: { slug: true } }),
-    prisma.category.findMany({ select: { slug: true, vertical: true } }),
-  ]);
-
+export default function sitemap(): MetadataRoute.Sitemap {
   const staticPaths = [
     "",
     "/banks",

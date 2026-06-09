@@ -4,9 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/format";
 import type { Locale } from "@/lib/site";
-import type { Prisma } from "@prisma/client";
-
-type PostWithAuthor = Prisma.BlogPostGetPayload<{ include: { author: true } }>;
+import type { PostWithAuthor } from "@/data/types";
 
 const categoryKey: Record<string, string> = {
   BANKING: "banking",
