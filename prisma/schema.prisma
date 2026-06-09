@@ -1,0 +1,327 @@
+// Prisma schema — FinPort fintech affiliate platform
+//
+// LOCAL DEV: SQLite (zero-config, runs immediately).
+// PRODUCTION: switch `provider` to "postgresql" and point DATABASE_URL at your
+// Postgres instance. The model definitions are written to be portable: enums are
+// modelled as String unions (documented inline) and list/object data uses Json,
+// both of which behave identically on SQLite and Postgres.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+// Auth & users
+// ----------------------------------------------------------------------------
+
+/// role: "ADMIN" | "EDITOR" | "USER"
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String?
+  role         String   @default("USER")
+  image        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  authoredPosts Author? @relation(fields: [authorId], references: [id])
+  authorId      String?
+}
+
+// ----------------------------------------------------------------------------
+// Taxonomy
+// ----------------------------------------------------------------------------
+
+/// vertical: "BANKING" | "INSURANCE"
+model Category {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  vertical    String
+  description String?
+  icon        String?
+  order       Int     @default(0)
+  featured    Boolean @default(false)
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ----------------------------------------------------------------------------
+// Brands
+// ----------------------------------------------------------------------------
+
+model Bank {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  logoUrl     String?
+  description String?
+  country     String  @default("PL")
+  website     String?
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InsuranceProvider {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  logoUrl     String?
+  description String?
+  country     String  @default("PL")
+  website     String?
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ----------------------------------------------------------------------------
+// Products (bank accounts, cards, insurance policies)
+// ----------------------------------------------------------------------------
+
+/// type: "PERSONAL_ACCOUNT" | "BUSINESS_ACCOUNT" | "DEBIT_CARD" | "CREDIT_CARD"
+///       | "CAR_INSURANCE" | "HOME_INSURANCE" | "HEALTH_INSURANCE"
+///       | "LIFE_INSURANCE" | "TRAVEL_INSURANCE" | "BUSINESS_INSURANCE"
+model Product {
+  id       String  @id @default(cuid())
+  slug     String  @unique
+  name     String
+  tagline  String?
+  summary  String?
+  body     String? // long-form MDX/markdown description
+  logoUrl  String?
+  type     String
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  bankId String?
+  bank   Bank?   @relation(fields: [bankId], references: [id])
+
+  insuranceProviderId String?
+  insuranceProvider   InsuranceProvider? @relation(fields: [insuranceProviderId], references: [id])
+
+  // Pricing
+  currency        String  @default("PLN")
+  monthlyFee      Float?
+  cardFee         Float?
+  cashbackPercent Float?
+  promoAmount     Float? // welcome bonus / cashback amount in PLN
+
+  // Filterable boolean attributes
+  onlineOpening      Boolean @default(false)
+  applePay           Boolean @default(false)
+  googlePay          Boolean @default(false)
+  blik               Boolean @default(false)
+  foreignersFriendly Boolean @default(false)
+  businessFriendly   Boolean @default(false)
+  freeMaintenance    Boolean @default(false)
+  eurAccount         Boolean @default(false)
+  noPeselRequired    Boolean @default(false)
+
+  // Editorial JSON payloads (string[] / {label,value}[])
+  pros         Json?
+  cons         Json?
+  benefits     Json?
+  requirements Json?
+  badges       Json? // e.g. ["Best value", "Editor's choice"]
+
+  // Ranking
+  popularity Int     @default(0)
+  featured   Boolean @default(false)
+  published  Boolean @default(true)
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+
+  rating         ProductRating?
+  features       ProductFeature[]
+  reviews        Review[]
+  faqs           FAQ[]
+  affiliateLinks AffiliateLink[]
+  leadHits       LeadProduct[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([categoryId])
+  @@index([featured])
+}
+
+model ProductFeature {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  group     String? // e.g. "Fees", "Limits", "Digital"
+  label     String
+  value     String
+  icon      String?
+  order     Int     @default(0)
+}
+
+model ProductRating {
+  id        String  @id @default(cuid())
+  productId String  @unique
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  overall   Float @default(0) // 0..5
+  fees      Float @default(0)
+  usability Float @default(0)
+  support   Float @default(0)
+  benefits  Float @default(0)
+  reviewCount Int @default(0)
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  authorName String
+  rating    Int // 1..5
+  title     String?
+  body      String
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+// ----------------------------------------------------------------------------
+// Affiliate
+// ----------------------------------------------------------------------------
+
+model AffiliateLink {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  partner   String
+  url       String
+  label     String   @default("Apply now")
+  isActive  Boolean  @default(true)
+  clicks    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+// ----------------------------------------------------------------------------
+// Editorial: blog, authors, FAQ, comparisons
+// ----------------------------------------------------------------------------
+
+model Author {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  role      String?
+  bio       String?
+  avatarUrl String?
+  posts     BlogPost[]
+  users     User[]
+  createdAt DateTime @default(now())
+}
+
+/// category: "BANKING" | "INSURANCE" | "BUSINESS" | "GUIDES" | "FOREIGNERS"
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String?
+  coverImage  String?
+  category    String   @default("GUIDES")
+  // MDX lives in src/content/blog/<slug>.mdx; this row stores metadata + SEO.
+  contentPath String?
+  readingMins Int      @default(5)
+
+  authorId String?
+  author   Author? @relation(fields: [authorId], references: [id])
+
+  published   Boolean   @default(true)
+  publishedAt DateTime  @default(now())
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+
+  faqs FAQ[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([published])
+}
+
+model FAQ {
+  id       String  @id @default(cuid())
+  question String
+  answer   String
+  order    Int     @default(0)
+
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  blogPostId String?
+  blogPost   BlogPost? @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+}
+
+model Comparison {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  title      String
+  productIds Json // string[]
+  createdAt  DateTime @default(now())
+}
+
+// ----------------------------------------------------------------------------
+// Lead generation
+// ----------------------------------------------------------------------------
+
+model Lead {
+  id        String   @id @default(cuid())
+  email     String?
+  source    String   @default("wizard")
+  answers   Json // recommendation wizard answers
+  createdAt DateTime @default(now())
+
+  recommended LeadProduct[]
+}
+
+model LeadProduct {
+  id        String  @id @default(cuid())
+  leadId    String
+  lead      Lead    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  rank      Int     @default(0)
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  locale    String   @default("pl")
+  confirmed Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
