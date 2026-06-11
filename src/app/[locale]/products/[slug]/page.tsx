@@ -255,7 +255,7 @@ export default async function ProductDetailPage({
                   FP
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">FinPort Editorial</p>
+                  <p className="font-medium text-foreground">BankPilots Editorial</p>
                   <p className="text-xs">{t("author")}</p>
                 </div>
               </div>

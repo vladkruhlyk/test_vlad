@@ -4,20 +4,20 @@
  */
 
 export const siteConfig = {
-  name: "FinPort",
-  legalName: "FinPort Sp. z o.o.",
-  domain: "finport.pl",
+  name: "BankPilots",
+  legalName: "BankPilots Sp. z o.o.",
+  domain: "bankpilots.pl",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   description:
     "Compare bank accounts, cards and insurance offers in Poland based on fees, benefits and your personal needs.",
   locales: ["pl", "en", "uk"] as const,
   defaultLocale: "pl" as const,
   social: {
-    twitter: "@finport_pl",
-    linkedin: "https://linkedin.com/company/finport",
+    twitter: "@bankpilots",
+    linkedin: "https://linkedin.com/company/bankpilots",
   },
   contact: {
-    email: "hello@finport.pl",
+    email: "hello@bankpilots.pl",
   },
 } as const;
 

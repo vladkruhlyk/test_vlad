@@ -1,4 +1,4 @@
-# FinPort — Fintech Affiliate Comparison Platform (Poland)
+# BankPilots — Fintech Affiliate Comparison Platform (Poland)
 
 A production-ready, SEO-first comparison platform for the Polish market: bank
 accounts, cards and insurance. Users compare products and click **Apply**, which

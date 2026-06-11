@@ -43,6 +43,6 @@ export const posts: BlogPost[] = rawPosts.map((p) => ({
   metaDescription: p.excerpt,
   ogImage: null,
   faqs: [
-    { id: `${p.slug}-q0`, question: "Where can I compare these products?", answer: "Use the FinPort comparison tool to see live fees and benefits side by side.", order: 0 },
+    { id: `${p.slug}-q0`, question: "Where can I compare these products?", answer: "Use the BankPilots comparison tool to see live fees and benefits side by side.", order: 0 },
   ],
 }));

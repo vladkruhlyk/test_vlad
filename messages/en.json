@@ -56,7 +56,7 @@
     "emailPlaceholder": "Your email",
     "subscribe": "Subscribe",
     "rights": "All rights reserved.",
-    "disclaimer": "FinPort is an independent affiliate comparison platform — not a bank, insurer, broker or financial advisor. We may receive compensation from partners when users apply through links on this website. Information presented here is for informational purposes only and should not be considered financial advice. Product terms and conditions should always be verified directly with the provider. Applications are always completed on the partner's official website."
+    "disclaimer": "BankPilots is an independent affiliate comparison platform — not a bank, insurer, broker or financial advisor. We may receive compensation from partners when users apply through links on this website. Information presented here is for informational purposes only and should not be considered financial advice. Product terms and conditions should always be verified directly with the provider. Applications are always completed on the partner's official website."
   },
   "Home": {
     "metaTitle": "Compare accounts, cards and insurance in Poland",
@@ -129,7 +129,7 @@
     },
     "faq": {
       "title": "Frequently asked questions",
-      "subtitle": "Everything worth knowing about using FinPort."
+      "subtitle": "Everything worth knowing about using BankPilots."
     },
     "wizardCta": {
       "title": "Not sure what to pick?",
@@ -265,7 +265,7 @@
     "from": "from"
   },
   "Pages": {
-    "aboutTitle": "About FinPort",
+    "aboutTitle": "About BankPilots",
     "aboutLead": "We help people in Poland make better financial decisions.",
     "contactTitle": "Contact",
     "contactLead": "Have a question? Get in touch.",

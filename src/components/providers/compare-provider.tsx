@@ -3,7 +3,7 @@
 import * as React from "react";
 
 const MAX_COMPARE = 4;
-const STORAGE_KEY = "finport:compare";
+const STORAGE_KEY = "bankpilots:compare";
 
 interface CompareContextValue {
   ids: string[];

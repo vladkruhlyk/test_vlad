@@ -130,7 +130,7 @@ const rawProducts: RawProduct[] = [
       { question: "How do I avoid the monthly fee?", answer: "Make at least one card payment per month and the 0 PLN fee applies automatically." },
       { question: "Can I open the account online?", answer: "Yes, the whole process is online and takes about 10 minutes with a video or transfer verification." },
     ],
-    affiliate: { partner: "mBank Affiliate", url: "https://mbank.pl/ekonto?ref=finport" },
+    affiliate: { partner: "mBank Affiliate", url: "https://mbank.pl/ekonto?ref=bankpilots" },
   },
   {
     slug: "ing-konto-direct", name: "ING Konto Direct", tagline: "Simple, transparent and genuinely free",
@@ -150,7 +150,7 @@ const rawProducts: RawProduct[] = [
       { group: "Digital", label: "BLIK", value: "Yes" },
     ],
     faqs: [{ question: "Is the account really free?", answer: "Yes, the monthly account fee is always 0 PLN. A small card fee may apply if you don't use the card." }],
-    affiliate: { partner: "ING Affiliate", url: "https://ing.pl/konto-direct?ref=finport" },
+    affiliate: { partner: "ING Affiliate", url: "https://ing.pl/konto-direct?ref=bankpilots" },
   },
   {
     slug: "revolut-standard", name: "Revolut Standard", tagline: "Borderless banking for foreigners and travellers",
@@ -174,7 +174,7 @@ const rawProducts: RawProduct[] = [
       { question: "Can I open Revolut without a PESEL?", answer: "Yes. Revolut only requires a valid passport or national ID, making it popular with newcomers to Poland." },
       { question: "Does it support EUR?", answer: "Yes, you can hold and exchange EUR alongside 25+ other currencies." },
     ],
-    affiliate: { partner: "Revolut Affiliate", url: "https://revolut.com/pl?ref=finport" },
+    affiliate: { partner: "Revolut Affiliate", url: "https://revolut.com/pl?ref=bankpilots" },
   },
   {
     slug: "santander-konto-jakie-chce", name: "Santander Konto Jakie Chcę", tagline: "Flexible account with strong cashback",
@@ -194,7 +194,7 @@ const rawProducts: RawProduct[] = [
       { group: "Digital", label: "BLIK", value: "Yes" },
     ],
     faqs: [{ question: "How much cashback can I earn?", answer: "Up to 2% on selected categories, subject to a monthly cap defined in the current promotion." }],
-    affiliate: { partner: "Santander Affiliate", url: "https://santander.pl/konto?ref=finport" },
+    affiliate: { partner: "Santander Affiliate", url: "https://santander.pl/konto?ref=bankpilots" },
   },
   {
     slug: "nest-konto-biznes", name: "Nest Konto Biznes", tagline: "Built for sole traders and small companies",
@@ -214,7 +214,7 @@ const rawProducts: RawProduct[] = [
       { group: "Business", label: "Multi-user", value: "Yes" },
     ],
     faqs: [{ question: "Is it suitable for a JDG?", answer: "Yes, Nest Konto Biznes is designed for sole traders and small companies, with free maintenance and tax transfers." }],
-    affiliate: { partner: "Nest Bank Affiliate", url: "https://nestbank.pl/biznes?ref=finport" },
+    affiliate: { partner: "Nest Bank Affiliate", url: "https://nestbank.pl/biznes?ref=bankpilots" },
   },
   {
     slug: "millennium-konto-360", name: "Millennium Konto 360°", tagline: "A complete everyday account with cashback",
@@ -233,7 +233,7 @@ const rawProducts: RawProduct[] = [
       { group: "Rewards", label: "Cashback", value: "Up to 1.5%" },
     ],
     faqs: [{ question: "How do I get cashback?", answer: "Activate the cashback program in the app and pay with your card at participating merchants." }],
-    affiliate: { partner: "Millennium Affiliate", url: "https://bankmillennium.pl/konto-360?ref=finport" },
+    affiliate: { partner: "Millennium Affiliate", url: "https://bankmillennium.pl/konto-360?ref=bankpilots" },
   },
   {
     slug: "pko-konto-dla-mlodych", name: "PKO Konto dla Młodych", tagline: "Free student account from Poland's biggest bank",
@@ -252,7 +252,7 @@ const rawProducts: RawProduct[] = [
       { group: "Digital", label: "App", value: "IKO" },
     ],
     faqs: [{ question: "What happens after I turn 26?", answer: "The account converts to a standard plan; you can switch to another free account before then." }],
-    affiliate: { partner: "PKO Affiliate", url: "https://pkobp.pl/mlodzi?ref=finport" },
+    affiliate: { partner: "PKO Affiliate", url: "https://pkobp.pl/mlodzi?ref=bankpilots" },
   },
   {
     slug: "link4-oc", name: "Link4 OC", tagline: "Affordable mandatory car insurance, fully online",
@@ -272,7 +272,7 @@ const rawProducts: RawProduct[] = [
       { group: "Service", label: "Quote", value: "Online, instant" },
     ],
     faqs: [{ question: "Is OC insurance mandatory?", answer: "Yes, third-party liability (OC) is legally required for every registered vehicle in Poland." }],
-    affiliate: { partner: "Link4 Affiliate", url: "https://link4.pl/oc?ref=finport" },
+    affiliate: { partner: "Link4 Affiliate", url: "https://link4.pl/oc?ref=bankpilots" },
   },
   {
     slug: "pzu-dom", name: "PZU Dom", tagline: "Comprehensive home insurance from a leading insurer",
@@ -292,7 +292,7 @@ const rawProducts: RawProduct[] = [
       { group: "Cover", label: "Liability", value: "Included" },
     ],
     faqs: [{ question: "Does it cover renters?", answer: "Yes, PZU Dom offers cover for both owners and tenants, with options tailored to each." }],
-    affiliate: { partner: "PZU Affiliate", url: "https://pzu.pl/dom?ref=finport" },
+    affiliate: { partner: "PZU Affiliate", url: "https://pzu.pl/dom?ref=bankpilots" },
   },
   {
     slug: "warta-zycie", name: "Warta Życie", tagline: "Flexible life insurance for your family's security",
@@ -311,7 +311,7 @@ const rawProducts: RawProduct[] = [
       { group: "Cover", label: "Critical illness", value: "Optional rider" },
     ],
     faqs: [{ question: "Do I need a medical exam?", answer: "Most policies require a health questionnaire; higher cover amounts may require a medical exam." }],
-    affiliate: { partner: "Warta Affiliate", url: "https://warta.pl/zycie?ref=finport" },
+    affiliate: { partner: "Warta Affiliate", url: "https://warta.pl/zycie?ref=bankpilots" },
   },
   {
     slug: "allianz-zdrowie", name: "Allianz Zdrowie", tagline: "Private healthcare with fast specialist access",
@@ -330,7 +330,7 @@ const rawProducts: RawProduct[] = [
       { group: "Cover", label: "Telemedicine", value: "24/7" },
     ],
     faqs: [{ question: "How fast can I see a specialist?", answer: "Allianz guarantees appointment times for many specialties, typically within a few business days." }],
-    affiliate: { partner: "Allianz Affiliate", url: "https://allianz.pl/zdrowie?ref=finport" },
+    affiliate: { partner: "Allianz Affiliate", url: "https://allianz.pl/zdrowie?ref=bankpilots" },
   },
   {
     slug: "ergo-hestia-podroze", name: "ERGO Hestia Podróże", tagline: "Travel insurance with strong medical cover",
@@ -349,7 +349,7 @@ const rawProducts: RawProduct[] = [
       { group: "Cover", label: "Baggage", value: "Included" },
     ],
     faqs: [{ question: "Does it cover COVID-19?", answer: "Yes, most ERGO Hestia travel plans include medical cover related to COVID-19 abroad." }],
-    affiliate: { partner: "ERGO Hestia Affiliate", url: "https://ergohestia.pl/podroze?ref=finport" },
+    affiliate: { partner: "ERGO Hestia Affiliate", url: "https://ergohestia.pl/podroze?ref=bankpilots" },
   },
 ];
 

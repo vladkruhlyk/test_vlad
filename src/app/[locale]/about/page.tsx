@@ -43,7 +43,7 @@ export default async function AboutPage({
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr]">
           <div className="space-y-5 text-muted-foreground">
             <p className="text-lg leading-relaxed">
-              FinPort started with a simple frustration: comparing financial products in Poland was
+              BankPilots started with a simple frustration: comparing financial products in Poland was
               confusing, slow and full of hidden costs. We set out to build a comparison platform
               that feels like a modern fintech product — fast, clear and genuinely helpful.
             </p>

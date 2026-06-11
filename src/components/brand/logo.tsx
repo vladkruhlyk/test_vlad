@@ -8,7 +8,7 @@ import { siteConfig } from "@/lib/site";
 const display = Space_Grotesk({ subsets: ["latin"], weight: ["600", "700"], display: "swap" });
 
 /**
- * FinPort wordmark logo — no icon, just a styled type lockup.
+ * BankPilots wordmark logo — no icon, just a styled type lockup.
  * `localized` (default) uses the locale-aware router; set it false in contexts
  * without a NextIntl provider (e.g. the admin panel).
  */
@@ -31,10 +31,10 @@ export function Logo({
       <span
         className={cn(
           display.className,
-          "text-2xl font-bold tracking-[-0.045em] text-foreground",
+          "text-2xl font-bold tracking-[-0.04em] text-foreground",
         )}
       >
-        Fin<span className="text-accent">Port</span>
+        Bank<span className="text-accent">Pilots</span>
       </span>
       {/* accent dot mark */}
       <span className="mb-[5px] h-[7px] w-[7px] rounded-full bg-accent transition-transform duration-200 group-hover:scale-125" />

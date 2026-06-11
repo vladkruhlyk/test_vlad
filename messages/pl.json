@@ -56,7 +56,7 @@
     "emailPlaceholder": "Twój e-mail",
     "subscribe": "Zapisz się",
     "rights": "Wszelkie prawa zastrzeżone.",
-    "disclaimer": "FinPort jest niezależną platformą porównawczą i afiliacyjną — nie jest bankiem, ubezpieczycielem, brokerem ani doradcą finansowym. Możemy otrzymać wynagrodzenie od partnerów, gdy użytkownicy składają wnioski przez linki na tej stronie. Informacje na tej stronie mają charakter wyłącznie informacyjny i nie stanowią porady finansowej. Warunki produktów należy zawsze zweryfikować bezpośrednio u dostawcy. Wnioski składa się zawsze na oficjalnej stronie partnera."
+    "disclaimer": "BankPilots jest niezależną platformą porównawczą i afiliacyjną — nie jest bankiem, ubezpieczycielem, brokerem ani doradcą finansowym. Możemy otrzymać wynagrodzenie od partnerów, gdy użytkownicy składają wnioski przez linki na tej stronie. Informacje na tej stronie mają charakter wyłącznie informacyjny i nie stanowią porady finansowej. Warunki produktów należy zawsze zweryfikować bezpośrednio u dostawcy. Wnioski składa się zawsze na oficjalnej stronie partnera."
   },
   "Home": {
     "metaTitle": "Porównaj konta, karty i ubezpieczenia w Polsce",
@@ -129,7 +129,7 @@
     },
     "faq": {
       "title": "Najczęstsze pytania",
-      "subtitle": "Wszystko, co warto wiedzieć o korzystaniu z FinPort."
+      "subtitle": "Wszystko, co warto wiedzieć o korzystaniu z BankPilots."
     },
     "wizardCta": {
       "title": "Nie wiesz, co wybrać?",
@@ -265,7 +265,7 @@
     "from": "od"
   },
   "Pages": {
-    "aboutTitle": "O FinPort",
+    "aboutTitle": "O BankPilots",
     "aboutLead": "Pomagamy Polakom podejmować lepsze decyzje finansowe.",
     "contactTitle": "Kontakt",
     "contactLead": "Masz pytanie? Napisz do nas.",

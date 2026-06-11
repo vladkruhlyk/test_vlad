@@ -7,7 +7,7 @@ import { Cookie } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 
-const STORAGE_KEY = "finport:cookie-consent";
+const STORAGE_KEY = "bankpilots:cookie-consent";
 
 /**
  * Cookie consent banner. Privacy-preserving by default: nothing optional is

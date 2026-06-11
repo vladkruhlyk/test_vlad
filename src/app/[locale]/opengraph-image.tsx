@@ -37,7 +37,7 @@ export default async function OpengraphImage() {
               fontWeight: 700,
             }}
           >
-            F
+            B
           </div>
           <span style={{ fontSize: 34, fontWeight: 600, color: "#0F172A" }}>
             {siteConfig.name}
