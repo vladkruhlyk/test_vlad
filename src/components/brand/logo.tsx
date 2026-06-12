@@ -1,11 +1,7 @@
 import NextLink from "next/link";
-import { Space_Grotesk } from "next/font/google";
 import { Link as IntlLink } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/lib/site";
-
-// Distinctive geometric display face for the wordmark.
-const display = Space_Grotesk({ subsets: ["latin"], weight: ["600", "700"], display: "swap" });
 
 /**
  * BankPilots wordmark logo — no icon, just a styled type lockup.
@@ -28,12 +24,7 @@ export function Logo({
       className={cn("group inline-flex items-end gap-[3px] leading-none", className)}
       aria-label={`${siteConfig.name} — home`}
     >
-      <span
-        className={cn(
-          display.className,
-          "text-2xl font-bold tracking-[-0.04em] text-foreground",
-        )}
-      >
+      <span className="font-sans text-xl font-bold tracking-tight text-foreground">
         Bank<span className="text-accent">Pilots</span>
       </span>
       {/* accent dot mark */}
